@@ -7,6 +7,7 @@ import Link from "next/link";
 interface productListProps {
   categoryId: string;
   limit?: number;
+  searchParams? : any;
 }
 
 const ProductList = async ({ categoryId, limit }: productListProps) => {
