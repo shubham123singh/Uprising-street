@@ -7,7 +7,7 @@ import Link from "next/link";
 interface productListProps {
   categoryId: string;
   limit?: number;
-  searchParams? : any;
+  searchParams?: any;
 }
 
 const ProductList = async ({ categoryId, limit }: productListProps) => {
@@ -19,11 +19,11 @@ const ProductList = async ({ categoryId, limit }: productListProps) => {
     .find();
 
   return (
-    <div className="flex gap-x-8 gap-y-16 justify-between flex-wrap">
+    <div className="flex gap-x-8 gap-y-16 justify-between flex-wrap  ">
       {res.items.map((product: products.Product) => (
         <Link
           href={"/" + product.slug}
-          className="w-full flex flex-col gap-4 sm:w-[45%] lg:w-[22%]"
+          className="w-full flex flex-col gap-4 sm:w-[45%] lg:w-[22%] shadow-2xl rounded-2xl"
           key={product._id}
         >
           <div className="relative w-full h-80">
@@ -50,19 +50,20 @@ const ProductList = async ({ categoryId, limit }: productListProps) => {
               />
             )}
           </div>
-          <div className="flex justify-between">
-            <span className="font-medium">{product.name}</span>
-            <span className="font-semibold">
-              {product.priceData?.currency} {product.priceData?.price}
-            </span>
+          <div className="flex flex-col items-start p-2 ">
+            <span className="font-medium ">{product.name}</span>
+            <span className="font-light line-through text-sm">₹ {product.priceData?.price}</span>
+            <span className="font-medium">₹ {product.priceData?.discountedPrice}</span>
           </div>
-          <div className="text-sm text-gray-500">{product.description}</div>
-          <Button
-            variant="destructive"
-            className="w-max hover:text-red-500 hover:bg-white rounded-2xl ring-1 ring-red-500"
-          >
-            Add to Cart
-          </Button>
+          <div className="text-sm text-gray-500 p-3">{product.description}</div>
+          <div className="flex justify-center p-3">
+            <Button
+              variant="destructive"
+              className="hover:text-red-500 hover:bg-white rounded-2xl ring-1 ring-red-500"
+            >
+              Add to Cart
+            </Button>
+          </div>
         </Link>
       ))}
     </div>

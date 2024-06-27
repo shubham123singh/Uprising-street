@@ -33,7 +33,7 @@ const Home = async () => {
       </div>
 
       <div className="mt-24">
-        <h1 className="text-2xl font-semibold px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 mb-12">
+        <h1 className="text-2xl font-semibold px-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64 mb-12 ">
           Categories
         </h1>
         <Suspense fallback = {"loading"}>
