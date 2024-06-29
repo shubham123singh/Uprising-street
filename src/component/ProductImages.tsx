@@ -23,7 +23,7 @@ import { useState } from "react";
 //  ];
 export const ProductImages = ({item} :{item : any}) => {
 
-    const[index, setIndex] = useState(0);
+  const[index, setIndex] = useState(0);
   return (
     <div>
       <div className="h-[500px] relative">

@@ -3,6 +3,8 @@ import { wixClientServer } from "@/lib/wixClientServer";
 import { products } from "@wix/stores";
 import Image from "next/image";
 import Link from "next/link";
+import DOMPurify from "isomorphic-dompurify";
+import Pagination from "./Pagination";
 
 interface productListProps {
   categoryId: string;
@@ -10,13 +12,33 @@ interface productListProps {
   searchParams?: any;
 }
 
-const ProductList = async ({ categoryId, limit }: productListProps) => {
+const ProductList = async ({
+  categoryId,
+  limit,
+  searchParams,
+}: productListProps) => {
   const wixClient = await wixClientServer();
-  const res = await wixClient.products
+  let productQuery = wixClient.products
     .queryProducts()
+    .startsWith("name", searchParams?.name || "")
     .eq("collectionIds", categoryId)
-    .limit(limit || 20)
-    .find();
+    .hasSome("productType", [searchParams?.type || "physical", "digital"])
+    .gt("priceData.price", searchParams?.min || 0)
+    .lt("priceData.price", searchParams?.max || 999999)
+    .limit(limit || 8)
+    .skip(searchParams?.page ? parseInt(searchParams.page) * (limit || 8): 0)
+    
+
+  if (searchParams?.sort) {
+    const [sortType, sortBy] = searchParams.sort.split(" ");
+    if (sortType === "asc") {
+      productQuery = productQuery.ascending(sortBy);
+    }
+    if (sortType === "desc") {
+      productQuery = productQuery.descending(sortBy);
+    }
+  }
+  const res = await productQuery.find();
 
   return (
     <div className="flex gap-x-8 gap-y-16 justify-between flex-wrap  ">
@@ -52,10 +74,19 @@ const ProductList = async ({ categoryId, limit }: productListProps) => {
           </div>
           <div className="flex flex-col items-start p-2 ">
             <span className="font-medium ">{product.name}</span>
-            <span className="font-light line-through text-sm">₹ {product.priceData?.price}</span>
-            <span className="font-medium">₹ {product.priceData?.discountedPrice}</span>
+            <span className="font-light line-through text-sm">
+              ₹ {product.priceData?.price}
+            </span>
+            <span className="font-medium">
+              ₹ {product.priceData?.discountedPrice}
+            </span>
           </div>
-          <div className="text-sm text-gray-500 p-3">{product.description}</div>
+          <div
+            className="text-sm text-gray-500 p-3"
+            dangerouslySetInnerHTML={{
+              __html: DOMPurify.sanitize(product.description!),
+            }}
+          ></div>
           <div className="flex justify-center p-3">
             <Button
               variant="destructive"
@@ -66,6 +97,11 @@ const ProductList = async ({ categoryId, limit }: productListProps) => {
           </div>
         </Link>
       ))}
+      <Pagination
+        currentPage={res.currentPage || 0}
+        hasPrev={res.hasPrev()}
+        hasNext={res.hasNext()}
+      />
     </div>
   );
 };

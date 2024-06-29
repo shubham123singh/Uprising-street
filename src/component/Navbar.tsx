@@ -2,7 +2,7 @@ import Link from "next/link";
 import Menu from "./Menu";
 import Image from "next/image";
 import { SearchBar } from "./SearchBar";
-import { NavIcon } from "./NavIcon";
+import NavIcon from "./NavIcon";
 
 const NavBar = () => {
   return (
